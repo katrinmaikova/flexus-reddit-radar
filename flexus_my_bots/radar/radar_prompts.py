@@ -20,23 +20,26 @@ When the user asks about past data, trends, or competitor mentions:
 When the user asks to run research, collect data, or trigger the pipeline, execute the full pipeline:
 
 ### STEP 1 — Collect Reddit data
-Use the `web` tool to browse Reddit subreddits and run search queries. Do NOT use python_execute for Reddit fetching — Reddit requires OAuth for its API and direct requests will hang.
 
-For each subreddit, open: `https://www.reddit.com/r/{SUBREDDIT}/top/?t=week`
+Use the `web` tool with the `search` parameter (Google search) — do NOT use `open` on reddit.com URLs, those return a JavaScript bundle with no useful content.
 
-Process these subreddits in groups of 3–4:
-- Group 1 (AI-first): AI_Agents, n8n, nocode, ArtificialIntelligence
-- Group 2 (Business-first 1): smallbusiness, Entrepreneur, EntrepreneurRideAlong, SaaS
-- Group 3 (Business-first 2): startups, indiehackers
-- Group 4 (Vertical): ecommerce, shopify, msp, sales
+**Subreddit scans** — run these searches in parallel groups of 3–4:
+- Group 1: `search={"q": "site:reddit.com/r/AI_Agents"}`, `site:reddit.com/r/n8n`, `site:reddit.com/r/nocode`, `site:reddit.com/r/ArtificialIntelligence`
+- Group 2: `site:reddit.com/r/smallbusiness`, `site:reddit.com/r/Entrepreneur`, `site:reddit.com/r/EntrepreneurRideAlong`, `site:reddit.com/r/SaaS`
+- Group 3: `site:reddit.com/r/startups`, `site:reddit.com/r/indiehackers`
+- Group 4: `site:reddit.com/r/ecommerce`, `site:reddit.com/r/shopify`, `site:reddit.com/r/msp`, `site:reddit.com/r/sales`
 
-Also run these Reddit search queries via `web` at `https://www.reddit.com/search/?q={QUERY}&sort=top&t=week`:
-"AI agents business", "AI agent platform SMB", "AI customer support chatbot",
-"AI SDR sales agent", "Tidio alternative", "Intercom Fin review",
-"Relevance AI review", "Lindy AI review", "n8n AI agents",
-"Make.com AI workflow", "AI for small business", "AI employee hiring", "AI teammate automation"
+Add `AI agents OR automation OR chatbot` to each site search to focus results, e.g.:
+`{"q": "site:reddit.com/r/AI_Agents AI agents automation"}`
 
-For high-signal posts (score > 50 or clearly relevant), open the post URL to read the full thread.
+**Topic searches** — run these searches (Google will find recent Reddit threads):
+`{"q": "reddit AI agents business 2026"}`, `"reddit AI agent platform small business"`,
+`"reddit Tidio alternative"`, `"reddit Intercom Fin review"`,
+`"reddit Relevance AI review"`, `"reddit Lindy AI review"`,
+`"reddit n8n AI agents"`, `"reddit Make.com AI workflow"`,
+`"reddit AI employee hiring"`, `"reddit AI teammate automation"`
+
+For any high-signal result (clearly relevant title), use `open` on the direct Reddit post URL to read the full thread.
 
 ### STEP 2 — Analyze and synthesize
 Write a structured Markdown report:
@@ -104,42 +107,25 @@ The setup message at the start of this conversation contains:
 
 ## STEP 1 — Collect Reddit data
 
-Use the `web` tool to browse Reddit subreddits and run search queries. Do NOT use python_execute for Reddit fetching — Reddit requires OAuth for its API and direct requests will hang.
+Use the `web` tool with the `search` parameter (Google search) — do NOT use `open` on reddit.com URLs, those return a JavaScript bundle with no useful content.
 
-### Subreddit browsing
-For each subreddit, fetch the top posts of the past week using the `web` tool to open the URL:
-`https://www.reddit.com/r/{SUBREDDIT}/top/?t=week`
+**Subreddit scans** — run these searches in parallel groups of 3–4. Use `search={"q": "site:reddit.com/r/SUBREDDIT TOPIC"}` format:
+- Group 1: site:reddit.com/r/AI_Agents AI agents, site:reddit.com/r/n8n automation, site:reddit.com/r/nocode tools, site:reddit.com/r/ArtificialIntelligence AI business
+- Group 2: site:reddit.com/r/smallbusiness AI tools, site:reddit.com/r/Entrepreneur automation, site:reddit.com/r/EntrepreneurRideAlong AI, site:reddit.com/r/SaaS AI agents
+- Group 3: site:reddit.com/r/startups AI, site:reddit.com/r/indiehackers automation
+- Group 4: site:reddit.com/r/ecommerce AI, site:reddit.com/r/shopify chatbot, site:reddit.com/r/msp AI, site:reddit.com/r/sales AI agent
 
-Process these subreddits in groups of 3–4 (one web call per subreddit):
-- Group 1 (AI-first): AI_Agents, n8n, nocode, ArtificialIntelligence
-- Group 2 (Business-first 1): smallbusiness, Entrepreneur, EntrepreneurRideAlong, SaaS
-- Group 3 (Business-first 2): startups, indiehackers
-- Group 4 (Vertical): ecommerce, shopify, msp, sales
+**Topic searches** — run these as plain Google queries:
+- "reddit Tidio alternative 2026"
+- "reddit Intercom Fin review"
+- "reddit Relevance AI review"
+- "reddit Lindy AI review"
+- "reddit n8n AI agents 2026"
+- "reddit AI agents small business"
+- "reddit AI employee hiring"
+- "reddit AI teammate automation"
 
-For each subreddit page, extract: post titles, scores/upvotes, direct post URLs, and any visible preview text.
-
-### Reddit search queries
-Use the `web` tool to search Reddit for each of these queries. Use search URL format:
-`https://www.reddit.com/search/?q={QUERY}&sort=top&t=week`
-
-Queries to run:
-- "AI agents business"
-- "AI agent platform SMB"
-- "AI customer support chatbot"
-- "AI SDR sales agent"
-- "Tidio alternative"
-- "Intercom Fin review"
-- "Relevance AI review"
-- "Lindy AI review"
-- "n8n AI agents"
-- "Make.com AI workflow"
-- "AI for small business"
-- "AI employee hiring"
-- "AI teammate automation"
-
-For high-signal posts (score > 50 or clearly relevant title), open the post URL with `web` to read the full thread.
-
-If a page fails to load or returns an error, note it and continue with the next.
+For any high-signal result (clearly relevant title), use `open` on the direct Reddit post URL to read the full thread.
 
 ## STEP 2 — Analyze and synthesize
 
