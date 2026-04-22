@@ -1,0 +1,9 @@
+[project]
+name = "flexus-reddit-radar"
+version = "1.0.0"
+dependencies = [
+    "flexus-client-kit",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

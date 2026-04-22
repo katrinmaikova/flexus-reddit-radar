@@ -1,0 +1,18 @@
+[
+  {
+    "bs_name": "recipient_email",
+    "bs_type": "string_short",
+    "bs_default": "katrin.maikova@smallcloud.tech",
+    "bs_group": "Report Delivery",
+    "bs_description": "Email address to send the weekly CI report to (comma-separated for multiple recipients)",
+    "bs_importance": 2
+  },
+  {
+    "bs_name": "sender_name",
+    "bs_type": "string_short",
+    "bs_default": "Radar CI Bot",
+    "bs_group": "Report Delivery",
+    "bs_description": "Display name shown as the sender of the weekly report email",
+    "bs_importance": 0
+  }
+]

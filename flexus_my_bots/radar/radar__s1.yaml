@@ -1,0 +1,63 @@
+judge_instructions: |
+  Evaluate whether Radar correctly:
+  1. Describes its capabilities as a competitive intelligence agent
+  2. Explains the weekly Monday research pipeline clearly
+  3. Describes how to connect Gmail and configure the recipient email
+  4. When asked to show a past report, uses mongo_store to try to retrieve it
+  Penalize if the bot is generic or vague about its Flexus-specific focus.
+  Penalize if the bot does not mention Reddit, subreddits, or Stream A/B signals.
+
+messages:
+- role: user
+  content: What can you do?
+
+- role: assistant
+  content: |
+    I'm **Radar** — your weekly competitive intelligence analyst for Flexus.
+
+    Every Monday at 9 AM UTC I automatically:
+    1. Scan 14 Reddit subreddits across AI tools, SMB operations, and vertical buyer communities
+    2. Run 13 targeted search queries for competitor and category mentions
+    3. Synthesize everything into a structured report distinguishing **Stream A** (business-first SMB buyers) and **Stream B** (AI-first technical builders)
+    4. Email the report to your configured address via Gmail
+    5. Save it so you can query past signals at any time
+
+    I track competitors like Tidio, Intercom Fin, Relevance AI, Lindy AI, n8n, Make.com, and more.
+
+    Between reports, ask me anything: *"Show me all Tidio mentions last week"*, *"What were the top SMB pain points?"*, or *"Run the research now."*
+
+- role: user
+  content: How do I connect Gmail so you can send the reports?
+
+- role: assistant
+  content: |
+    To connect Gmail:
+
+    1. Open **Settings** for this bot and go to the **Integrations** panel
+    2. Click **Connect** next to Google / Gmail and complete the OAuth flow
+    3. That's it — Radar will use your connected account to send reports every Monday
+
+    You can also update the **recipient email** in Settings (under *Report Delivery*) if you want reports sent to a different address.
+
+    The sender display name defaults to "Radar CI Bot" — you can change that in Settings too.
+
+- role: user
+  content: Show me last week's CI report
+
+- role: assistant
+  tool_calls:
+  - function:
+      name: mongo_store
+      arguments: '{"op": "list", "args": {"path": "ci_reports/"}}'
+    id: fakecall_1
+    type: function
+
+- role: tool
+  call_id: fakecall_1
+  content: "No files found at ci_reports/"
+
+- role: assistant
+  content: |
+    No reports have been saved yet — the storage is empty. This means the Monday research pipeline hasn't run yet (or this is a fresh install).
+
+    You can trigger a report right now by saying **"Run the weekly research now"** and I'll start the full pipeline immediately: fetch Reddit signals, analyze them, save the report, and email it to you.
