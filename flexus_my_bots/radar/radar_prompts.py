@@ -42,63 +42,42 @@ The setup message at the start of this conversation contains:
 
 ## STEP 1 — Collect Reddit data
 
-Use python_execute to fetch top posts from Reddit's JSON API for each subreddit.
-Fetch top posts from the past 7 days (t=week). Batch the subreddits into groups of 3-4 per call.
+Use the `web` tool to browse Reddit subreddits and run search queries. Do NOT use python_execute for Reddit fetching — Reddit requires OAuth for its API and direct requests will hang.
 
-Example Python code pattern:
-```python
-import requests, time, json
-headers = {"User-Agent": "Mozilla/5.0 (Radar-CI/1.0)"}
-results = {}
-subreddits = ["AI_Agents", "n8n", "nocode", "ArtificialIntelligence"]
-for sub in subreddits:
-    try:
-        url = f"https://www.reddit.com/r/{sub}/top.json?t=week&limit=25"
-        r = requests.get(url, headers=headers, timeout=15)
-        posts = r.json()["data"]["children"]
-        results[sub] = [{"title": p["data"]["title"], "score": p["data"]["score"],
-                          "url": "https://reddit.com" + p["data"]["permalink"],
-                          "text": p["data"]["selftext"][:600]} for p in posts]
-        time.sleep(1)
-    except Exception as e:
-        results[sub] = f"ERROR: {e}"
-print(json.dumps(results, indent=2))
-```
+### Subreddit browsing
+For each subreddit, fetch the top posts of the past week using the `web` tool to open the URL:
+`https://www.reddit.com/r/{SUBREDDIT}/top/?t=week`
 
-Fetch these subreddits in batches:
-- Batch 1 (AI-first): AI_Agents, n8n, nocode, ArtificialIntelligence
-- Batch 2 (Business-first 1): smallbusiness, Entrepreneur, EntrepreneurRideAlong, SaaS
-- Batch 3 (Business-first 2): startups, indiehackers
-- Batch 4 (Vertical): ecommerce, shopify, msp, sales
+Process these subreddits in groups of 3–4 (one web call per subreddit):
+- Group 1 (AI-first): AI_Agents, n8n, nocode, ArtificialIntelligence
+- Group 2 (Business-first 1): smallbusiness, Entrepreneur, EntrepreneurRideAlong, SaaS
+- Group 3 (Business-first 2): startups, indiehackers
+- Group 4 (Vertical): ecommerce, shopify, msp, sales
 
-Also run Reddit search queries (use search.json):
-```python
-import requests, time, json
-headers = {"User-Agent": "Mozilla/5.0 (Radar-CI/1.0)"}
-queries = [
-    "AI agents business", "AI agent platform SMB", "AI customer support chatbot",
-    "AI SDR sales agent", "Tidio alternative", "Intercom Fin review",
-    "Relevance AI review", "Lindy AI review", "n8n AI agents",
-    "Make.com AI workflow", "AI for small business", "AI employee hiring",
-    "AI teammate automation"
-]
-results = {}
-for q in queries:
-    try:
-        url = f"https://www.reddit.com/search.json?q={requests.utils.quote(q)}&sort=top&t=week&limit=15"
-        r = requests.get(url, headers=headers, timeout=15)
-        posts = r.json()["data"]["children"]
-        results[q] = [{"title": p["data"]["title"], "score": p["data"]["score"],
-                        "url": "https://reddit.com" + p["data"]["permalink"],
-                        "subreddit": p["data"]["subreddit"],
-                        "text": p["data"]["selftext"][:400]} for p in posts]
-        time.sleep(1.5)
-    except Exception as e:
-        results[q] = f"ERROR: {e}"
-print(json.dumps(results, indent=2))
-```
+For each subreddit page, extract: post titles, scores/upvotes, direct post URLs, and any visible preview text.
 
-If you get a 429 (rate limited), wait 5 seconds and retry. If a subreddit is unavailable, note it and continue.
+### Reddit search queries
+Use the `web` tool to search Reddit for each of these queries. Use search URL format:
+`https://www.reddit.com/search/?q={QUERY}&sort=top&t=week`
+
+Queries to run:
+- "AI agents business"
+- "AI agent platform SMB"
+- "AI customer support chatbot"
+- "AI SDR sales agent"
+- "Tidio alternative"
+- "Intercom Fin review"
+- "Relevance AI review"
+- "Lindy AI review"
+- "n8n AI agents"
+- "Make.com AI workflow"
+- "AI for small business"
+- "AI employee hiring"
+- "AI teammate automation"
+
+For high-signal posts (score > 50 or clearly relevant title), open the post URL with `web` to read the full thread.
+
+If a page fails to load or returns an error, note it and continue with the next.
 
 ## STEP 2 — Analyze and synthesize
 
