@@ -17,10 +17,11 @@ RESEARCHER_TOOLS = ",".join(
     | ckit_cloudtool.KANBAN_ADVANCED
 )
 
-# Default interactive expert: mongo_store to read reports, python_execute for filtering/analysis + kanban
+# Default expert: reads past reports AND can run the full research pipeline via web
 DEFAULT_TOOLS = ",".join(
     TOOL_NAMESET
     | ckit_cloudtool.CLOUDTOOLS_PYTHON
+    | ckit_cloudtool.CLOUDTOOLS_WEB
     | ckit_cloudtool.KANBAN_ADVANCED
 )
 
@@ -30,8 +31,8 @@ EXPERTS = [
         fexp_python_kernel="",
         fexp_allow_tools=DEFAULT_TOOLS,
         fexp_nature="NATURE_INTERACTIVE",
-        fexp_inactivity_timeout=3600,
-        fexp_description="Interactive expert for exploring past CI reports, querying competitor signals, and analyzing trends.",
+        fexp_inactivity_timeout=7200,
+        fexp_description="CI assistant: explores past reports and runs the full weekly Reddit research pipeline on request.",
     )),
     ("researcher", ckit_bot_install.FMarketplaceExpertInput(
         fexp_system_prompt=radar_prompts.RESEARCHER_SYSTEM_PROMPT,
